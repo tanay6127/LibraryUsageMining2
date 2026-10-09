@@ -1,0 +1,9 @@
+If_Borrowed,Also_Borrowed,support,confidence,lift
+Java Programming,Web Development,0.2,0.6666666666666667,2.2222222222222228
+Web Development,Java Programming,0.2,0.6666666666666667,2.2222222222222228
+Python Programming,Data Science,0.3,0.6,1.4999999999999998
+Data Science,Python Programming,0.3,0.7499999999999999,1.4999999999999998
+Machine Learning,Python Programming,0.3,0.7499999999999999,1.4999999999999998
+Python Programming,Machine Learning,0.3,0.6,1.4999999999999998
+Machine Learning,Data Science,0.2,0.5,1.25
+Data Science,Machine Learning,0.2,0.5,1.25

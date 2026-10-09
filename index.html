@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Library Analytics</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <h2>📚 LibraryIQ</h2>
+        <p>Collection Planning</p>
+        <a href="#overview">Overview</a>
+        <a href="#books">Book Analytics</a>
+        <a href="#clusters">Student Clusters</a>
+        <a href="#rules">Association Rules</a>
+    </aside>
+
+    <main class="main">
+        <header>
+            <div>
+                <p class="eyebrow">UNIVERSITY LIBRARY</p>
+                <h1>Library Analytics Dashboard</h1>
+                <p>Understand borrowing patterns and plan your collection.</p>
+            </div>
+            <span class="status">● Sample data</span>
+        </header>
+
+        <section id="overview" class="metrics">
+            <article class="metric">
+                <p>Borrowing Records</p>
+                <h2>{{ total_records }}</h2>
+            </article>
+            <article class="metric">
+                <p>Unique Students</p>
+                <h2>{{ total_students }}</h2>
+            </article>
+            <article class="metric">
+                <p>Unique Books</p>
+                <h2>{{ total_books }}</h2>
+            </article>
+        </section>
+
+        <section id="books" class="panel">
+            <h2>Book Popularity</h2>
+            <p>Number of borrowing records for each book.</p>
+            <div id="bookChart"></div>
+        </section>
+
+        <section class="panel">
+            <h2>Category Popularity</h2>
+            <div id="categoryChart"></div>
+        </section>
+
+        <section id="clusters" class="panel">
+            <h2>Student Borrowing Clusters</h2>
+            <p>Students grouped by their borrowing patterns.</p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Student ID</th><th>Cluster</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for item in clusters %}
+                        <tr>
+                            <td>{{ item.Student_ID }}</td>
+                            <td><span class="tag">Cluster {{ item.Cluster }}</span></td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="2">Run clustering.py to generate results.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="rules" class="panel">
+            <h2>Association Rules</h2>
+            <p>Relationships between books borrowed by students.</p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>If Borrowed</th>
+                            <th>Also Borrowed</th>
+                            <th>Support</th>
+                            <th>Confidence</th>
+                            <th>Lift</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for rule in rules %}
+                        <tr>
+                            <td>{{ rule.If_Borrowed }}</td>
+                            <td>{{ rule.Also_Borrowed }}</td>
+                            <td>{{ "%.0f%%"|format(rule.support * 100) }}</td>
+                            <td>{{ "%.1f%%"|format(rule.confidence * 100) }}</td>
+                            <td>{{ "%.2f"|format(rule.lift) }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5">Run association.py to generate rules.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>
+            LibraryIQ · Data-driven collection planning · Sample dataset
+        </footer>
+    </main>
+
+    <script>
+        const books = {{ book_counts | tojson }};
+        const categories = {{ category_counts | tojson }};
+
+        Plotly.newPlot("bookChart", [{
+            x: books.map(item => item.book),
+            y: books.map(item => item.count),
+            type: "bar",
+            marker: {color: "#6c7cff"}
+        }], {
+            margin: {t: 20, b: 100, l: 45, r: 20},
+            xaxis: {tickangle: -25},
+            yaxis: {title: "Borrowing records"},
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            font: {color: "#e4e8f5"}
+        }, {responsive: true});
+
+        Plotly.newPlot("categoryChart", [{
+            labels: categories.map(item => item.category),
+            values: categories.map(item => item.count),
+            type: "pie",
+            hole: 0.55
+        }], {
+            margin: {t: 20, b: 20, l: 20, r: 20},
+            paper_bgcolor: "rgba(0,0,0,0)",
+            font: {color: "#e4e8f5"},
+            showlegend: true
+        }, {responsive: true});
+    </script>
+</body>
+</html>
